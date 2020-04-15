@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gustav</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>This is Gustav!</h1>
+    <div data-controller="ignaz"
+         data-ignaz-graphql-endpoint="https://ignaz.herokuapp.com/graphql"
+         data-ignaz-currently-shown="ndeltaConf"
+         data-ignaz-date-min=""
+         data-ignaz-date-max=""
+         data-ignaz-ndeltaConf-max="0"
+         data-ignaz-ndeltaHosp-max="0"
+         data-ignaz-ndeltaIcu-max="0"
+         data-ignaz-ndeltaVent-max="0"
+         data-ignaz-ndeltaDeceased-max="0"
+         >
+
+      <div>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaConf"
+                class="button confirmed">Delta confirmed</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaHosp"
+                class="button hospitalized">Delta hospitalized</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaIcu"
+                class="button icu">Delta ICU</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaVent"
+                class="button ventilation">Delta ventilation</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaReleased"
+                class="button released">Delta released</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="ndeltaDeceased"
+                class="button deceased">Delta deceased</button>
+      </div>
+
+      <div class="my-4">
+        <div data-target="ignaz.loading">LOADING</div>
+
+        <table>
+          <thead data-target="ignaz.tableHeader"></thead>
+          <tbody data-target="ignaz.tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

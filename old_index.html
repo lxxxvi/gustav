@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Foo</title>
+    <script src="https://cdn.jsdelivr.net/npm/graphql.js@0.6.6/graphql.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://unpkg.com/chartkick@3.2.0/dist/chartkick.js"></script>
+  </head>
+  <body>
+    <h2>Delta Confirmed</h2>
+    <div id="chart" style="height: 300px;"></div>
+    <script type="text/javascript">
+
+      (async function() {
+        let request = graphql("https://ignaz.herokuapp.com/graphql")
+
+        const casesQuery = request(`query {
+            covidCases {
+              date
+              time
+              abbreviationCantonAndFl
+              ncumulConf
+              ndeltaConf
+            }
+        }`)
+
+        const cases = await casesQuery()
+
+        // AG
+        const agCases = cases.covidCases.filter((element) => { return element.abbreviationCantonAndFl == "AG"; });
+        const tiCases = cases.covidCases.filter((element) => { return element.abbreviationCantonAndFl == "TI"; });
+
+        const chartDataAG = agCases.reduce(function(result, item) {
+          result[item.date] = item.ndeltaConf;
+          return result;
+        }, {});
+
+        const chartDataTI = tiCases.reduce(function(result, item) {
+          result[item.date] = item.ndeltaConf;
+          return result;
+        }, {});
+
+        const chartData = [
+          {name: "AG", data: chartDataAG},
+          {name: "TI", data: chartDataTI}
+        ]
+
+        new Chartkick.LineChart("chart", chartData);
+
+
+      })();
+
+    </script>
+  </body>
+</html>

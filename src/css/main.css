@@ -1,0 +1,70 @@
+/*
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+*/
+
+* {
+  font-family: Arial;
+}
+
+.hidden {
+  display: none;
+}
+
+.button {
+  font-size: 1rem;
+  padding: 4px 8px;
+  border: 0;
+}
+
+.button:hover {
+  cursor: pointer;
+  opacity: 70%;
+}
+
+.ndeltaConf .matrix, .confirmed {
+  background-color: MediumBlue;
+  color: LightBlue;
+}
+
+.ndeltaHosp .matrix, .hospitalized {
+  background-color: Chocolate;
+  color: BlanchedAlmond;
+}
+
+.ndeltaIcu .matrix, .icu {
+  background-color: Purple;
+  color: Thistle;
+}
+
+.ndeltaVent .matrix, .ventilation {
+  background-color: Red;
+  color: White;
+}
+
+.ndeltaReleased .matrix, .released {
+  background-color: ForestGreen;
+  color: YellowGreen;
+}
+
+.ndeltaDeceased .matrix, .deceased {
+  background-color: Black;
+  color: White;
+}
+
+table {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+td:hover {
+  background-color: black;
+  color: white;
+  opacity: 100% !important;
+}
+
+.my-4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
