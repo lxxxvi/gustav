@@ -120,12 +120,12 @@ export default class extends Controller {
     var ths = ["<th></th>"]; // first empty column
 
     var currentDate =  moment(this.data.get('dateMin'));
-    let prevDay = currentDate.clone().subtract(1, 'day');
-    let colspan = 1;
+    let prevDay = currentDate.clone();
+    let colspan = 0;
 
     while(currentDate <= dateMax) {
       if (prevDay.format("MM") != currentDate.format("MM")) {
-        ths.push(`<th colspan="${colspan-1}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
+        ths.push(`<th colspan="${colspan}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
         colspan = 1;
       } else {
         colspan += 1;
