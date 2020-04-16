@@ -112,22 +112,47 @@ export default class extends Controller {
   }
 
   buildTableHeader() {
-    let tr = "<tr>__ths__</tr>";
+    let trs = [];
 
-    let ths = `<th width="10px"></th>`; // first empty column
-
-    const dateMin = moment(this.data.get('dateMin'));
     const dateMax = moment(this.data.get('dateMax'));
 
-    let currentDate = dateMin;
+    // months
+    var ths = ["<th></th>"]; // first empty column
+
+    var currentDate =  moment(this.data.get('dateMin'));
+    let prevDay = currentDate.clone().subtract(1, 'day');
+    let colspan = 1;
 
     while(currentDate <= dateMax) {
-      ths += `<th width="10px">${currentDate.format("DD/MM")}</th>`;
+      if (prevDay.format("MM") != currentDate.format("MM")) {
+        ths.push(`<th colspan="${colspan-1}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
+        colspan = 1;
+      } else {
+        colspan += 1;
+      }
+
+      prevDay = currentDate.clone();
       currentDate = currentDate.add(1, 'day');
     }
 
-    tr = tr.replace("__ths__", ths)
-    this.tableHeaderTarget.innerHTML = tr;
+    ths.push(`<th colspan="${colspan}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
+
+    trs.push(`<tr>${ths.join("")}</tr>`);
+    this.tableHeaderTarget.innerHTML = trs.join("");
+
+
+    // dates column
+    var ths = ["<th></th>"]; // first empty column
+
+    var currentDate = moment(this.data.get('dateMin'));
+
+    while(currentDate <= dateMax) {
+      ths.push(`<th width="32px">${currentDate.format("DD")}</th>`);
+      currentDate = currentDate.add(1, 'day');
+    }
+
+    trs.push(`<tr>${ths.join("")}</tr>`);
+    this.tableHeaderTarget.innerHTML = trs.join("");
   }
 
   buildTableBody(covidCases) {
@@ -144,6 +169,8 @@ export default class extends Controller {
     ];
 
     Array.from(sampleTargets).forEach(function(sampleTarget) {
+      let sampleTargetTotals = {};
+
       Object.entries(byCantonAndDate).forEach(function([canton, dates]) {
         let tds = [`<td>${canton}</td>`];
 
@@ -152,9 +179,10 @@ export default class extends Controller {
         while(currentDate <= dateMax) {
           let key = currentDate.format("YYYY-MM-DD");
           let date = dates[key];
-          let value = '';
+          let value = "&nbsp;";
           if(date !== undefined && Number.parseInt(date[sampleTarget]) >= 0) {
              value = date[sampleTarget];
+             sampleTargetTotals[key] = (sampleTargetTotals[key] || 0) + value;
           }
 
           let opacity = _this.getOpacity(value, _this.data.get(`${sampleTarget.toLowerCase()}Max`));
@@ -166,6 +194,23 @@ export default class extends Controller {
         let tr = `<tr class="hidden ${sampleTarget}">${tds.join("")}</tr>`;
         trs.push(tr)
       });
+
+      // TOTALS
+      let tds = [`<td>Total</td>`];
+
+      let currentDate = moment(_this.data.get('dateMin'));
+
+      while(currentDate <= dateMax) {
+        let key = currentDate.format("YYYY-MM-DD");
+        let value = sampleTargetTotals[key];
+
+        let opacity = _this.getOpacity(value, _this.data.get(`${sampleTarget.toLowerCase()}Max`));
+        tds.push(`<td class="matrix" style="opacity: ${opacity}%;" title="${value}">${value}</td>`);
+        currentDate = currentDate.add(1, 'day');
+      }
+
+      let tr = `<tr class="hidden ${sampleTarget} total">${tds.join("")}</tr>`;
+      trs.push(tr);
     });
 
     this.tableBodyTarget.innerHTML = trs.join("");

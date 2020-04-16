@@ -8,6 +8,10 @@
   font-family: Arial;
 }
 
+td, th {
+  max-width: 32px;
+}
+
 .hidden {
   display: none;
 }

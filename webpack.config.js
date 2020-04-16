@@ -3,8 +3,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: {
-    main: './src/index.js',
-    styles: './src/css/main.css'
+    main: './src/javascript/main.js',
+    styles: './src/css/styles.css'
   },
   mode: "production",
   devtool: "source-map",
@@ -36,6 +36,6 @@ module.exports = {
 
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "public")
+    path: path.resolve(__dirname, "dist")
   },
 };
