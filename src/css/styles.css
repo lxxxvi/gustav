@@ -27,32 +27,37 @@ td, th {
   opacity: 70%;
 }
 
-.ndeltaConf .matrix, .confirmed {
+.testedTotalDelta .matrix, .tested {
+  background-color: MediumVioletRed;
+  color: Pink;
+}
+
+.confirmedTotalDelta .matrix, .confirmed {
   background-color: MediumBlue;
   color: LightBlue;
 }
 
-.ndeltaHosp .matrix, .hospitalized {
+.hospitalizedCurrentDelta .matrix, .hospitalized {
   background-color: Chocolate;
   color: BlanchedAlmond;
 }
 
-.ndeltaIcu .matrix, .icu {
+.icuCurrentDelta .matrix, .icu {
   background-color: Purple;
   color: Thistle;
 }
 
-.ndeltaVent .matrix, .ventilation {
+.ventilationCurrentDelta .matrix, .ventilation {
   background-color: Red;
   color: White;
 }
 
-.ndeltaReleased .matrix, .released {
+.releasedTotalDelta .matrix, .released {
   background-color: ForestGreen;
   color: YellowGreen;
 }
 
-.ndeltaDeceased .matrix, .deceased {
+.deceasedTotalDelta .matrix, .deceased {
   background-color: Black;
   color: White;
 }
@@ -71,4 +76,31 @@ td:hover {
 .my-4 {
   margin-top: 16px;
   margin-bottom: 16px;
+}
+
+.opacity-10 { opacity: 10%; }
+.opacity-20 { opacity: 20%; }
+.opacity-30 { opacity: 30%; }
+.opacity-40 { opacity: 40%; }
+.opacity-50 { opacity: 50%; }
+.opacity-60 { opacity: 60%; }
+.opacity-70 { opacity: 70%; }
+.opacity-80 { opacity: 80%; }
+.opacity-90 { opacity: 90%; }
+.opacity-100 { opacity: 100%; }
+
+.text-white {
+  color: white !important;
+}
+
+.text-green {
+  color: green !important;
+}
+
+.bg-pale-green {
+  background-color: PaleGreen !important;
+}
+
+.bg-white {
+  background-color: white !important;
 }

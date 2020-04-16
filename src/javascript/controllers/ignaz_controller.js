@@ -15,18 +15,20 @@ export default class extends Controller {
                 date
                 time
                 abbreviationCantonAndFl
-                ncumulConf
-                ndeltaConf
-                ncumulHosp
-                ndeltaHosp
-                ncumulIcu
-                ndeltaIcu
-                ncumulVent
-                ndeltaVent
-                ncumulReleased
-                ndeltaReleased
-                ncumulDeceased
-                ndeltaDeceased
+                testedTotal
+                testedTotalDelta
+                confirmedTotal
+                confirmedTotalDelta
+                hospitalizedCurrent
+                hospitalizedCurrentDelta
+                icuCurrent
+                icuCurrentDelta
+                ventilationCurrent
+                ventilationCurrentDelta
+                releasedTotal
+                releasedTotalDelta
+                deceasedTotal
+                deceasedTotalDelta
               }
             }`
 
@@ -85,30 +87,34 @@ export default class extends Controller {
   }
 
   findMaximumDeltas(covidCases) {
-    let allDeltaConf = covidCases.map((obj) => obj.ndeltaConf);
+    let allDeltaTested = covidCases.map((obj) => obj.testedTotalDelta);
+    let deltaTestedMax = Math.max(...allDeltaTested);
+
+    let allDeltaConf = covidCases.map((obj) => obj.confirmedTotalDelta);
     let deltaConfMax = Math.max(...allDeltaConf);
 
-    let allDeltaHosp = covidCases.map((obj) => obj.ndeltaHosp);
+    let allDeltaHosp = covidCases.map((obj) => obj.hospitalizedCurrentDelta);
     let deltaHospMax =  Math.max(...allDeltaHosp);
 
-    let allDeltaIcu = covidCases.map((obj) => obj.ndeltaIcu);
+    let allDeltaIcu = covidCases.map((obj) => obj.icuCurrentDelta);
     let deltaIcuMax =  Math.max(...allDeltaIcu);
 
-    let allDeltaVent = covidCases.map((obj) => obj.ndeltaVent);
+    let allDeltaVent = covidCases.map((obj) => obj.ventilationCurrentDelta);
     let deltaVentMax =  Math.max(...allDeltaVent);
 
-    let allDeltaReleased = covidCases.map((obj) => obj.ndeltaReleased);
+    let allDeltaReleased = covidCases.map((obj) => obj.releasedTotalDelta);
     let deltaReleasedMax =  Math.max(...allDeltaReleased);
 
-    let allDeltaDeceased = covidCases.map((obj) => obj.ndeltaDeceased);
+    let allDeltaDeceased = covidCases.map((obj) => obj.deceasedTotalDelta);
     let deltaDeceasedMax =  Math.max(...allDeltaDeceased);
 
-    this.data.set('ndeltaconfMax', deltaConfMax);
-    this.data.set('ndeltahospMax', deltaHospMax);
-    this.data.set('ndeltaicuMax', deltaIcuMax);
-    this.data.set('ndeltaventMax', deltaVentMax);
-    this.data.set('ndeltareleasedMax', deltaReleasedMax);
-    this.data.set('ndeltadeceasedMax', deltaDeceasedMax);
+    this.data.set('testedTotalDeltaMax', deltaTestedMax);
+    this.data.set('confirmedTotalDeltaMax', deltaConfMax);
+    this.data.set('hospitalizedCurrentDeltaMax', deltaHospMax);
+    this.data.set('icuCurrentDeltaMax', deltaIcuMax);
+    this.data.set('ventilationCurrentDeltaMax', deltaVentMax);
+    this.data.set('releasedTotalDeltaMax', deltaReleasedMax);
+    this.data.set('deceasedTotalDeltaMax', deltaDeceasedMax);
   }
 
   buildTableHeader() {
@@ -165,7 +171,8 @@ export default class extends Controller {
     console.log('this.data', this.data);
 
     const sampleTargets = [
-      'ndeltaConf', 'ndeltaHosp', 'ndeltaIcu', 'ndeltaVent', 'ndeltaReleased', 'ndeltaDeceased'
+      'testedTotalDelta', 'confirmedTotalDelta', 'hospitalizedCurrentDelta', 'icuCurrentDelta',
+      'ventilationCurrentDelta', 'releasedTotalDelta', 'deceasedTotalDelta'
     ];
 
     Array.from(sampleTargets).forEach(function(sampleTarget) {
@@ -180,13 +187,13 @@ export default class extends Controller {
           let key = currentDate.format("YYYY-MM-DD");
           let date = dates[key];
           let value = "&nbsp;";
-          if(date !== undefined && Number.parseInt(date[sampleTarget]) >= 0) {
+          if(date !== undefined) {
              value = date[sampleTarget];
              sampleTargetTotals[key] = (sampleTargetTotals[key] || 0) + value;
           }
 
-          let opacity = _this.getOpacity(value, _this.data.get(`${sampleTarget.toLowerCase()}Max`));
-          tds.push(`<td class="matrix" style="opacity: ${opacity}%;" title="${value}">${value}</td>`);
+          let opacityClass = _this.getOpacityClass(value, _this.data.get(`${sampleTarget}Max`));
+          tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
 
           currentDate = currentDate.add(1, 'day');
         }
@@ -204,8 +211,8 @@ export default class extends Controller {
         let key = currentDate.format("YYYY-MM-DD");
         let value = sampleTargetTotals[key];
 
-        let opacity = _this.getOpacity(value, _this.data.get(`${sampleTarget.toLowerCase()}Max`));
-        tds.push(`<td class="matrix" style="opacity: ${opacity}%;" title="${value}">${value}</td>`);
+        let opacityClass = _this.getOpacityClass(value, _this.data.get(`${sampleTarget}Max`));
+        tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
         currentDate = currentDate.add(1, 'day');
       }
 
@@ -238,12 +245,16 @@ export default class extends Controller {
     return byCantonAndDate;
   }
 
-  getOpacity(value, max) {
-    if(Number.parseInt(value) > 0) {
+  getOpacityClass(value, max) {
+    let parsedValue = Number.parseInt(value);
+
+    if(parsedValue > 0) {
       let percentage = value / max * 100;
-      return Math.ceil(percentage / 10) * 10;
+      return `opacity-${Math.ceil(percentage / 10) * 10}`;
+    } else if (parsedValue < 0) {
+      return 'bg-pale-green text-green opacity-50';
     } else {
-      return 0;
+      return "bg-white text-white";
     }
   }
 }

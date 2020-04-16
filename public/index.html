@@ -9,38 +9,43 @@
     <h1>This is Gustav!</h1>
     <div data-controller="ignaz"
          data-ignaz-graphql-endpoint="https://ignaz.herokuapp.com/graphql"
-         data-ignaz-currently-shown="ndeltaConf"
+         data-ignaz-currently-shown="testedTotalDelta"
          data-ignaz-date-min=""
          data-ignaz-date-max=""
-         data-ignaz-ndeltaConf-max="0"
-         data-ignaz-ndeltaHosp-max="0"
-         data-ignaz-ndeltaIcu-max="0"
-         data-ignaz-ndeltaVent-max="0"
-         data-ignaz-ndeltaDeceased-max="0"
+         data-ignaz-tested-total-delta-max="0"
+         data-ignaz-confirmed-total-delta-max="0"
+         data-ignaz-hospitalized-current-delta-max="0"
+         data-ignaz-icu-current-delta-max="0"
+         data-ignaz-ventilation-current-delta-max="0"
+         data-ignaz-released-total-delta-max="0"
+         data-ignaz-deceased-total-delta-max="0"
          >
 
       <div>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaConf"
-                class="button confirmed">Delta confirmed</button>
+                data-display-sample-target="testedTotalDelta"
+                class="button tested">Tested delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaHosp"
-                class="button hospitalized">Delta hospitalized</button>
+                data-display-sample-target="confirmedTotalDelta"
+                class="button confirmed">Confirmed delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaIcu"
-                class="button icu">Delta ICU</button>
+                data-display-sample-target="hospitalizedCurrentDelta"
+                class="button hospitalized">Currently hospitalized delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaVent"
-                class="button ventilation">Delta ventilation</button>
+                data-display-sample-target="icuCurrentDelta"
+                class="button icu">Currently in ICU delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaReleased"
-                class="button released">Delta released</button>
+                data-display-sample-target="ventilationCurrentDelta"
+                class="button ventilation">Currently requiring ventilation delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
-                data-display-sample-target="ndeltaDeceased"
-                class="button deceased">Delta deceased</button>
+                data-display-sample-target="releasedTotalDelta"
+                class="button released">Released delta</button>
+        <button data-action="click->ignaz#handleDisplayButtonClick"
+                data-display-sample-target="deceasedTotalDelta"
+                class="button deceased">Deceased delta</button>
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="total"
-                class="button total">Delta totals</button>
+                class="button total">Totals</button>
       </div>
 
       <div class="my-4">

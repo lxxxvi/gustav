@@ -19,8 +19,8 @@
               date
               time
               abbreviationCantonAndFl
-              ncumulConf
-              ndeltaConf
+              confirmedTotal
+              confirmedTotalDelta
             }
         }`)
 
@@ -31,12 +31,12 @@
         const tiCases = cases.covidCases.filter((element) => { return element.abbreviationCantonAndFl == "TI"; });
 
         const chartDataAG = agCases.reduce(function(result, item) {
-          result[item.date] = item.ndeltaConf;
+          result[item.date] = item.confirmedTotalDelta;
           return result;
         }, {});
 
         const chartDataTI = tiCases.reduce(function(result, item) {
-          result[item.date] = item.ndeltaConf;
+          result[item.date] = item.confirmedTotalDelta;
           return result;
         }, {});
 
