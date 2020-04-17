@@ -9,7 +9,6 @@ export default class extends Controller {
   }
 
   fetchData() {
-    console.log('fetchData');
     let query = `query {
               covidCases {
                 date
@@ -32,16 +31,38 @@ export default class extends Controller {
               }
             }`
 
-    fetch(this.data.get("graphqlEndpoint"), {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({query})
-    })
-      .then(response => response.json())
-      .then(json => this.renderChart(json.data.covidCases));
+    if(this.storedIgnazData === null) {
+      console.log('fetching from ignaz');
+      fetch(this.data.get("graphqlEndpoint"), {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({query})
+      })
+        .then(response => response.json())
+        .then(json => this.storeIgnazData(json.data.covidCases))
+        .then(this.renderChart(this.storedIgnazData));
+    } else {
+      console.log('taking from store');
+      this.renderChart(this.storedIgnazData);
+    }
+  }
+
+  storeIgnazData(covidCases) {
+    window.sessionStorage.setItem("lastFetched", moment());
+    window.sessionStorage.setItem("covidCases", JSON.stringify(covidCases));
+  }
+
+  get storedIgnazData() {
+    let lastFetched = moment(window.sessionStorage.getItem("lastFetchted"));
+
+    if (typeof(Storage) === "undefined" || lastFetched < moment().subtract(10, 'minutes')) {
+      return null;
+    }
+
+    return JSON.parse(window.sessionStorage.getItem("covidCases"));
   }
 
   renderChart(covidCases) {
