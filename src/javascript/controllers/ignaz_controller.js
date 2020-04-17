@@ -47,11 +47,23 @@ export default class extends Controller {
   renderChart(covidCases) {
     console.log('covidCases: ', covidCases);
     this.loadingTarget.classList.add('hidden');
-    this.findDateRange(covidCases);
-    this.findMaximumDeltas(covidCases);
+    this.setDateRange(covidCases);
+    this.setMaximumDeltas(covidCases);
     this.buildTableHeader();
     this.buildTableBody(covidCases);
     this.display(this.data.get('currentlyShown'));
+  }
+
+  get sampleTargets() {
+    return [
+      'testedTotalDelta',
+      'confirmedTotalDelta',
+      'hospitalizedCurrentDelta',
+      'icuCurrentDelta',
+      'ventilationCurrentDelta',
+      'releasedTotalDelta',
+      'deceasedTotalDelta'
+    ];
   }
 
   handleDisplayButtonClick(event) {
@@ -71,7 +83,19 @@ export default class extends Controller {
     this.data.set('currentlyShown', sampleTarget);
   }
 
-  findDateRange(covidCases) {
+  get fromMoment() {
+    return moment(this.data.get('dateMin'));
+  }
+
+  get toMoment() {
+    return moment(this.data.get('dateMax'));
+  }
+
+  sampleTargetMaximum(sampleTarget) {
+    return this.data.get(`${sampleTarget}Max`);
+  }
+
+  setDateRange(covidCases) {
     let allDateNumbers = covidCases.map(function(obj) {
       let date = obj.date;
       let time = obj.time === undefined ? "00:00" : obj.time;
@@ -86,117 +110,89 @@ export default class extends Controller {
     this.data.set('dateMax', moment(dateMax).format());
   }
 
-  findMaximumDeltas(covidCases) {
-    let allDeltaTested = covidCases.map((obj) => obj.testedTotalDelta);
-    let deltaTestedMax = Math.max(...allDeltaTested);
+  findMaximumForAttribute(objects, attribute) {
+    return Math.max(...objects.map(obj => obj[attribute]));
+  }
 
-    let allDeltaConf = covidCases.map((obj) => obj.confirmedTotalDelta);
-    let deltaConfMax = Math.max(...allDeltaConf);
-
-    let allDeltaHosp = covidCases.map((obj) => obj.hospitalizedCurrentDelta);
-    let deltaHospMax =  Math.max(...allDeltaHosp);
-
-    let allDeltaIcu = covidCases.map((obj) => obj.icuCurrentDelta);
-    let deltaIcuMax =  Math.max(...allDeltaIcu);
-
-    let allDeltaVent = covidCases.map((obj) => obj.ventilationCurrentDelta);
-    let deltaVentMax =  Math.max(...allDeltaVent);
-
-    let allDeltaReleased = covidCases.map((obj) => obj.releasedTotalDelta);
-    let deltaReleasedMax =  Math.max(...allDeltaReleased);
-
-    let allDeltaDeceased = covidCases.map((obj) => obj.deceasedTotalDelta);
-    let deltaDeceasedMax =  Math.max(...allDeltaDeceased);
-
-    this.data.set('testedTotalDeltaMax', deltaTestedMax);
-    this.data.set('confirmedTotalDeltaMax', deltaConfMax);
-    this.data.set('hospitalizedCurrentDeltaMax', deltaHospMax);
-    this.data.set('icuCurrentDeltaMax', deltaIcuMax);
-    this.data.set('ventilationCurrentDeltaMax', deltaVentMax);
-    this.data.set('releasedTotalDeltaMax', deltaReleasedMax);
-    this.data.set('deceasedTotalDeltaMax', deltaDeceasedMax);
+  setMaximumDeltas(covidCases) {
+    this.sampleTargets.forEach((attribute) => {
+      this.data.set(`${attribute}Max`, this.findMaximumForAttribute(covidCases, attribute));
+    });
   }
 
   buildTableHeader() {
     let trs = [];
+    trs.push(this.buildMonthHeaderRow());
+    trs.push(this.buildDayHeaderRow());
+    this.tableHeaderTarget.innerHTML = trs.join("");
+  }
 
-    const dateMax = moment(this.data.get('dateMax'));
-
-    // months
+  buildMonthHeaderRow() {
     var ths = ["<th></th>"]; // first empty column
 
-    var currentDate =  moment(this.data.get('dateMin'));
-    let prevDay = currentDate.clone();
+    let prevDay = this.fromMoment;
     let colspan = 0;
 
-    while(currentDate <= dateMax) {
-      if (prevDay.format("MM") != currentDate.format("MM")) {
+    this.dateRange.forEach((date) => {
+      if (prevDay.format("MM") != date.format("MM")) {
         ths.push(`<th colspan="${colspan}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
         colspan = 1;
       } else {
         colspan += 1;
       }
 
-      prevDay = currentDate.clone();
-      currentDate = currentDate.add(1, 'day');
-    }
+      prevDay = date.clone();
+    });
 
     ths.push(`<th colspan="${colspan}" style="text-align: left;">${prevDay.format("MMM")}</th>`);
 
-    trs.push(`<tr>${ths.join("")}</tr>`);
-    this.tableHeaderTarget.innerHTML = trs.join("");
+    return `<tr>${ths.join("")}</tr>`;
+  }
 
-
-    // dates column
+  buildDayHeaderRow() {
     var ths = ["<th></th>"]; // first empty column
+    this.dateRange.forEach((date) => {
+      ths.push(`<th width="32px">${date.format("DD")}</th>`);
+    });
 
-    var currentDate = moment(this.data.get('dateMin'));
+    return `<tr>${ths.join("")}</tr>`;
+  }
 
-    while(currentDate <= dateMax) {
-      ths.push(`<th width="32px">${currentDate.format("DD")}</th>`);
-      currentDate = currentDate.add(1, 'day');
+  get dateRange() {
+    let dates = [];
+    let currentDate =  this.fromMoment;
+
+    while(currentDate <= this.toMoment) {
+      dates.push(currentDate.clone());
+      currentDate.add(1, 'day');
     }
 
-    trs.push(`<tr>${ths.join("")}</tr>`);
-    this.tableHeaderTarget.innerHTML = trs.join("");
+    return dates;
   }
 
   buildTableBody(covidCases) {
     let byCantonAndDate = this.groupByCantonAndDate(covidCases);
-    const dateMax = moment(this.data.get('dateMax'));
 
     let trs = [];
-    let _this = this;
 
-    console.log('this.data', this.data);
-
-    const sampleTargets = [
-      'testedTotalDelta', 'confirmedTotalDelta', 'hospitalizedCurrentDelta', 'icuCurrentDelta',
-      'ventilationCurrentDelta', 'releasedTotalDelta', 'deceasedTotalDelta'
-    ];
-
-    Array.from(sampleTargets).forEach(function(sampleTarget) {
+    this.sampleTargets.forEach((sampleTarget) => {
       let sampleTargetTotals = {};
 
-      Object.entries(byCantonAndDate).forEach(function([canton, dates]) {
+      Object.entries(byCantonAndDate).forEach(([canton, cantonDates]) => {
         let tds = [`<td>${canton}</td>`];
 
-        let currentDate = moment(_this.data.get('dateMin'));
-
-        while(currentDate <= dateMax) {
-          let key = currentDate.format("YYYY-MM-DD");
-          let date = dates[key];
+        this.dateRange.forEach((date) => {
+          let key = date.format("YYYY-MM-DD");
+          let sampleDate = cantonDates[key];
           let value = "&nbsp;";
-          if(date !== undefined) {
-             value = date[sampleTarget];
+          if(sampleDate !== undefined) {
+             value = sampleDate[sampleTarget];
              sampleTargetTotals[key] = (sampleTargetTotals[key] || 0) + value;
           }
 
-          let opacityClass = _this.getOpacityClass(value, _this.data.get(`${sampleTarget}Max`));
+          let opacityClass = this.getOpacityClass(value, this.sampleTargetMaximum(sampleTarget));
           tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
-
-          currentDate = currentDate.add(1, 'day');
-        }
+        });
 
         let tr = `<tr class="hidden ${sampleTarget}">${tds.join("")}</tr>`;
         trs.push(tr)
@@ -205,16 +201,13 @@ export default class extends Controller {
       // TOTALS
       let tds = [`<td>Total</td>`];
 
-      let currentDate = moment(_this.data.get('dateMin'));
-
-      while(currentDate <= dateMax) {
-        let key = currentDate.format("YYYY-MM-DD");
+      this.dateRange.forEach((date) => {
+        let key = date.format("YYYY-MM-DD");
         let value = sampleTargetTotals[key];
 
-        let opacityClass = _this.getOpacityClass(value, _this.data.get(`${sampleTarget}Max`));
+        let opacityClass = this.getOpacityClass(value, this.sampleTargetMaximum(sampleTarget));
         tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
-        currentDate = currentDate.add(1, 'day');
-      }
+      });
 
       let tr = `<tr class="hidden ${sampleTarget} total">${tds.join("")}</tr>`;
       trs.push(tr);
