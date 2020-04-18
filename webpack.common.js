@@ -1,9 +1,11 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    main: './src/javascript/main.js',
+    app: './src/javascript/app.js',
     styles: './src/css/styles.css'
   },
   mode: "production",
@@ -25,17 +27,24 @@ module.exports = {
         exclude: [
           /node_modules/
         ],
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader'
+        ]
       }
     ]
   },
 
   plugins: [
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "[name].[contenthash].css"
+    }),
+    new HtmlWebpackPlugin({template: "src/index.html"}),
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/)
   ],
 
   output: {
-    filename: "[name].js",
+    filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist")
   },
 };
