@@ -39,7 +39,10 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "[name].[contenthash].css"
     }),
-    new HtmlWebpackPlugin({template: "src/index.html"}),
+    new HtmlWebpackPlugin({
+      template: "src/index.html",
+      favicon: "src/images/favicon.ico"
+    }),
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/)
   ],
 
