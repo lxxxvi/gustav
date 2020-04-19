@@ -42,8 +42,10 @@ export default class extends Controller {
         body: JSON.stringify({query})
       })
         .then(response => response.json())
-        .then(json => this.storeIgnazData(json.data.covidCases))
-        .then(this.renderChart(this.storedIgnazData));
+        .then(json => {
+          this.storeIgnazData(json.data.covidCases);
+          this.renderChart(json.data.covidCases);
+        });
     } else {
       console.log('taking from store');
       this.renderChart(this.storedIgnazData);
