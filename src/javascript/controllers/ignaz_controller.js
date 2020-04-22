@@ -1,8 +1,15 @@
 import { Controller } from "stimulus";
 var moment = require('moment');
+import GustavConfig from "../lib/GustavConfig.js"
+import GustavStyler from "../lib/GustavStyler.js";
 
 export default class extends Controller {
-  static targets = ["loading", "tableHeader", "tableBody"]
+  static targets = ["status", "buttons", "tableHeader", "tableBody"]
+
+  initialize() {
+    this.gustavConfig = new GustavConfig();
+    this.gustavStyler = new GustavStyler(this.gustavConfig, {});
+  }
 
   connect() {
     this.fetchData();
@@ -69,24 +76,14 @@ export default class extends Controller {
 
   renderChart(covidCases) {
     console.log('covidCases: ', covidCases);
-    this.loadingTarget.classList.add('hidden');
+    this.statusTarget.innerHTML = 'Preparing data...';
     this.setDateRange(covidCases);
     this.setMaximumDeltas(covidCases);
+    this.gustavStyler.setSampleTargetMaximums(this.sampleTargetMaximums());
     this.buildTableHeader();
     this.buildTableBody(covidCases);
+    this.statusTarget.classList.add('hidden');
     this.display(this.data.get('currentlyShown'));
-  }
-
-  get sampleTargets() {
-    return [
-      'testedTotalDelta',
-      'confirmedTotalDelta',
-      'hospitalizedCurrentDelta',
-      'icuCurrentDelta',
-      'ventilationCurrentDelta',
-      'releasedTotalDelta',
-      'deceasedTotalDelta'
-    ];
   }
 
   handleDisplayButtonClick(event) {
@@ -114,6 +111,14 @@ export default class extends Controller {
     return moment(this.data.get('dateMax'));
   }
 
+  sampleTargetMaximums() {
+    return this.gustavConfig.sampleTargetColumnNames.reduce((acc, curr) => {
+      this.sampleTargetMaximum
+      acc[curr] = this.sampleTargetMaximum(curr);
+      return acc;
+    }, {});
+  }
+
   sampleTargetMaximum(sampleTarget) {
     return this.data.get(`${sampleTarget}Max`);
   }
@@ -138,7 +143,7 @@ export default class extends Controller {
   }
 
   setMaximumDeltas(covidCases) {
-    this.sampleTargets.forEach((attribute) => {
+    this.gustavConfig.sampleTargetColumnNames.forEach((attribute) => {
       this.data.set(`${attribute}Max`, this.findMaximumForAttribute(covidCases, attribute));
     });
   }
@@ -198,41 +203,42 @@ export default class extends Controller {
 
     let trs = [];
 
-    this.sampleTargets.forEach((sampleTarget) => {
+    this.gustavConfig.sampleTargets.forEach((sampleTarget) => {
       let sampleTargetTotals = {};
+      let sampleTargetColumnName = sampleTarget.columnName;
 
       Object.entries(byCantonAndDate).forEach(([canton, cantonDates]) => {
-        let tds = [`<td>${canton}</td>`];
+        let tds = [`<td class="y-th">${canton}</td>`];
 
         this.dateRange.forEach((date) => {
           let key = date.format("YYYY-MM-DD");
           let sampleDate = cantonDates[key];
-          let value = "&nbsp;";
+          let value = null;
           if(sampleDate !== undefined) {
-             value = sampleDate[sampleTarget];
+             value = sampleDate[sampleTargetColumnName];
              sampleTargetTotals[key] = (sampleTargetTotals[key] || 0) + value;
           }
 
-          let opacityClass = this.getOpacityClass(value, this.sampleTargetMaximum(sampleTarget));
-          tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
+          let cellClasses = this.gustavStyler.getCellClasses(value, sampleTargetColumnName);
+          tds.push(`<td class="matrix ${cellClasses}" title="${value || "NULL"}">${value || "&nbsp;"}</td>`);
         });
 
-        let tr = `<tr class="hidden ${sampleTarget}">${tds.join("")}</tr>`;
+        let tr = `<tr class="hidden ${sampleTargetColumnName}">${tds.join("")}</tr>`;
         trs.push(tr)
       });
 
       // TOTALS
-      let tds = [`<td>Total</td>`];
+      let tds = [`<td class="y-th">Total ${sampleTarget.name}</td>`];
 
       this.dateRange.forEach((date) => {
         let key = date.format("YYYY-MM-DD");
         let value = sampleTargetTotals[key];
 
-        let opacityClass = this.getOpacityClass(value, this.sampleTargetMaximum(sampleTarget));
-        tds.push(`<td class="matrix ${opacityClass}" title="${value}">${value}</td>`);
+        let cellClasses = this.gustavStyler.getCellClasses(value, sampleTargetColumnName);
+        tds.push(`<td class="matrix ${cellClasses}" title="${value}">${value}</td>`);
       });
 
-      let tr = `<tr class="hidden ${sampleTarget} total">${tds.join("")}</tr>`;
+      let tr = `<tr class="hidden ${sampleTargetColumnName} total">${tds.join("")}</tr>`;
       trs.push(tr);
     });
 
@@ -259,18 +265,5 @@ export default class extends Controller {
     });
 
     return byCantonAndDate;
-  }
-
-  getOpacityClass(value, max) {
-    let parsedValue = Number.parseInt(value);
-
-    if(parsedValue > 0) {
-      let percentage = value / max * 100;
-      return `opacity-${Math.ceil(percentage / 10) * 10}`;
-    } else if (parsedValue < 0) {
-      return 'bg-pale-green text-green opacity-50';
-    } else {
-      return "bg-white text-white";
-    }
   }
 }

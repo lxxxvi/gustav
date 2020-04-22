@@ -5,7 +5,12 @@
     <meta charset="utf-8">
   </head>
   <body>
-    <h1>This is Gustav!</h1>
+    <h1 class="text-xl font-semibold my-3 tracking-widest uppercase inline-block text-pink-600 bg-gray-200">Gustav</h1>
+    <div class="my-3 text-gray-700">
+      <p>Gustav displays COVID19 case numbers Cantons of Switzerland and Principality of Liechtenstein (FL).</p>
+      <p>Gustav focuses on the <b>difference</b> between two dates, no cumulative numbers are shown.</p>
+      <p>Data is refreshed every ten minutes.</p>
+    </div>
     <div data-controller="ignaz"
          data-ignaz-graphql-endpoint="https://ignaz.herokuapp.com/graphql"
          data-ignaz-currently-shown="testedTotalDelta"
@@ -18,42 +23,55 @@
          data-ignaz-ventilation-current-delta-max="0"
          data-ignaz-released-total-delta-max="0"
          data-ignaz-deceased-total-delta-max="0"
-         >
+         class="my-4">
 
       <div>
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="testedTotalDelta"
-                class="button tested">Tested delta</button>
+                class="button bg-gustav-pink-100 border border-gustav-pink-100 text-white hover:bg-gustav-pink-80">Tested</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="confirmedTotalDelta"
-                class="button confirmed">Confirmed delta</button>
+                class="button bg-gustav-indigo-100 border border-gustav-indigo-100 text-white hover:bg-gustav-indigo-80">Confirmed</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="hospitalizedCurrentDelta"
-                class="button hospitalized">Currently hospitalized delta</button>
+                class="button bg-gustav-purple-100 border border-gustav-purple-100 text-white hover:bg-gustav-purple-80">Hospitalized</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="icuCurrentDelta"
-                class="button icu">Currently in ICU delta</button>
+                class="button bg-gustav-orange-100 border border-gustav-orange-100 text-white hover:bg-gustav-orange-80">ICU</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="ventilationCurrentDelta"
-                class="button ventilation">Currently requiring ventilation delta</button>
+                class="button bg-gustav-red-100 border border-gustav-red-100 text-white hover:bg-gustav-red-80">Ventilation</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="releasedTotalDelta"
-                class="button released">Released delta</button>
+                class="button bg-gustav-green-100 border border-gustav-green-100 text-black hover:bg-gustav-green-80">Released</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="deceasedTotalDelta"
-                class="button deceased">Deceased delta</button>
+                class="button bg-gustav-gray-100 border border-gustav-gray-100 text-white hover:bg-gustav-gray-80">Deceased</button>
+
         <button data-action="click->ignaz#handleDisplayButtonClick"
                 data-display-sample-target="total"
-                class="button total">Totals</button>
+                class="button bg-white text-gray-800 border hover:bg-gray-200">Totals</button>
       </div>
 
       <div class="my-4">
-        <div data-target="ignaz.loading">LOADING</div>
+        <div data-target="ignaz.status">Loading data...</div>
 
-        <table>
-          <thead data-target="ignaz.tableHeader"></thead>
-          <tbody data-target="ignaz.tableBody"></tbody>
-        </table>
+        <div class="my-10">
+          <table>
+            <thead data-target="ignaz.tableHeader"></thead>
+            <tbody data-target="ignaz.tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <p class="text-xs">
+          Data: <a href="https://github.com/openZH/covid_19">openZH/covid_19</a> | Code: <a href="https://github.com/lxxxvi/gustav/">lxxxvi/gustav</a></p>
       </div>
     </div>
   </body>

@@ -1,106 +1,39 @@
-/*
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-*/
 
 * {
-  font-family: Arial;
+  @apply font-sans;
 }
 
-td, th {
-  max-width: 32px;
-}
-
-.hidden {
-  display: none;
+body {
+  @apply my-10 mx-5;
 }
 
 .button {
-  font-size: 1rem;
-  padding: 4px 8px;
-  border: 0;
+  @apply text-base py-2 px-3;
 }
 
 .button:hover {
-  cursor: pointer;
-  opacity: 70%;
+  @apply cursor-pointer;
 }
 
-.testedTotalDelta .matrix, .tested {
-  background-color: MediumVioletRed;
-  color: Pink;
+td, th {
+  @apply border border-gray-200;
 }
 
-.confirmedTotalDelta .matrix, .confirmed {
-  background-color: MediumBlue;
-  color: LightBlue;
+.y-th {
+  @apply text-right;
 }
 
-.hospitalizedCurrentDelta .matrix, .hospitalized {
-  background-color: Chocolate;
-  color: BlanchedAlmond;
+a {
+  @apply text-blue-600;
 }
 
-.icuCurrentDelta .matrix, .icu {
-  background-color: Purple;
-  color: Thistle;
-}
-
-.ventilationCurrentDelta .matrix, .ventilation {
-  background-color: Red;
-  color: White;
-}
-
-.releasedTotalDelta .matrix, .released {
-  background-color: ForestGreen;
-  color: YellowGreen;
-}
-
-.deceasedTotalDelta .matrix, .deceased {
-  background-color: Black;
-  color: White;
+a:hover {
+  @apply text-blue-300;
 }
 
 table {
-  text-align: center;
-  font-size: 0.8rem;
-}
-
-td:hover {
-  background-color: black;
-  color: white;
-  opacity: 100% !important;
-}
-
-.my-4 {
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.opacity-10 { opacity: 10%; }
-.opacity-20 { opacity: 20%; }
-.opacity-30 { opacity: 30%; }
-.opacity-40 { opacity: 40%; }
-.opacity-50 { opacity: 50%; }
-.opacity-60 { opacity: 60%; }
-.opacity-70 { opacity: 70%; }
-.opacity-80 { opacity: 80%; }
-.opacity-90 { opacity: 90%; }
-.opacity-100 { opacity: 100%; }
-
-.text-white {
-  color: white !important;
-}
-
-.text-green {
-  color: green !important;
-}
-
-.bg-pale-green {
-  background-color: PaleGreen !important;
-}
-
-.bg-white {
-  background-color: white !important;
+  @apply text-xs text-center;
 }
